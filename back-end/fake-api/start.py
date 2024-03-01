@@ -29,3 +29,30 @@ async def gerar_compra():
             "dateTime": fake.iso8601(),
         }
     ]
+
+@app.get("/gerar_compra/{numero_registro}")
+async def gerar_compra(numero_registro: int):
+
+    if numero_registro < 1:
+        return {"Error": "Numero de registros precisa ser maior que 1"}
+    
+    respostas = []
+    for _ in range(numero_registro):
+        index = random.randint(1, len(df) - 1)
+        tuple = df.iloc[index]
+        compra = {
+                "client": fake.name(),
+                "creditcard": fake.credit_card_provider(),
+                "product": tuple["Product Name"],
+                "ean": int(tuple["EAN"]),
+                "price": round(float(tuple["Price"]) * 1.2, 2), 
+                "clientPosition": fake.location_on_land(),
+                "store": lojapadraoonline,
+                "dateTime": fake.iso8601(),
+        }
+        respostas.append(compra)
+
+    return respostas
+    
+
+        
