@@ -41,5 +41,4 @@ class APICollector:
             return result
 
         def transformDf(self, response):
-            result = pd.DataFrame(response)
-            return result
+            return pd.DataFrame(response)
