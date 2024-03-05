@@ -8,7 +8,7 @@ fake = Faker()
 
 lojapadraoonline = 11
 
-file_name = 'back-end/fake-api/products.csv'
+file_name = 'backend/fakeapi/products.csv'
 df = pd.read_csv(file_name, sep=",")
 df['index'] = range(1, len(df) + 1)
 df.set_index('index', inplace=True)
