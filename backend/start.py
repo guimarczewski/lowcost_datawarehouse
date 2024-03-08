@@ -2,9 +2,19 @@ from datasource.api import APICollector
 from contracts.schema import CompraSchema
 from aws.client import S3Client
 
+import time
+import schedule
+
 schema = CompraSchema
 aws = S3Client()
 
-minha_classe = APICollector(schema, aws).start(20)
+def apiCollector(schema, aws, repeat):
+    response = APICollector(schema, aws).start(repeat)
+    print('Executado')
+    return
 
-print(minha_classe)
+schedule.every(1).minutes.do(apiCollector, schema, aws, 10)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
