@@ -4,9 +4,6 @@ from dotenv import load_dotenv
 import sys
 import os
 
-# Suponha que você tenha uma variável de ambiente chamada "MINHA_VARIAVEL"
-# Você pode acessar seu valor usando a função os.environ.get()
-
 load_dotenv()  # Carrega as variáveis do arquivo .env
 
 
