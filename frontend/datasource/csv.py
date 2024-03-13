@@ -2,13 +2,13 @@ import streamlit as st
 import openpyxl
 import pandas as pd
 from pydantic import ValidationError
+from io import BytesIO
+from aws.client import upload_to_aws
 
 
 class CSVCollector:
-        def __init__ (self, schema, aws, cell_range):
+        def __init__ (self, schema, cell_range):
             self._schema = schema
-            self._aws = aws
-            self._buffer = None
             self.cell_range = cell_range
             return
 
@@ -19,7 +19,9 @@ class CSVCollector:
                 extractData = self.extractData(getData)
             if extractData is not None:
                 validateData = self.validateData(extractData)
-                return validateData
+                if validateData is not None:  # Se a validação for bem-sucedida
+                    self.loadData(validateData)  # Chamada para o método loadData
+                    return validateData
 
         def getData(self):
             dados_excel = st.file_uploader("Insira o arquivo Excel", type=".xlsx")
@@ -61,4 +63,4 @@ class CSVCollector:
             return dataframe
 
         def loadData(self, response):
-            pass
+            upload_to_aws(response)

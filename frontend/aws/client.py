@@ -1,66 +1,42 @@
 import boto3
-from botocore.exceptions import NoCredentialsError
+import pandas as pd
+from io import BytesIO
 from dotenv import load_dotenv
-import sys
 import os
 
-# Suponha que você tenha uma variável de ambiente chamada "MINHA_VARIAVEL"
-# Você pode acessar seu valor usando a função os.environ.get()
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
-load_dotenv()  # Carrega as variáveis do arquivo .env
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+AWS_REGION = os.getenv("AWS_REGION")
+DELTA_LAKE_S3_PATH = os.getenv("DELTA_LAKE_S3_PATH")
 
 
-class S3Client:
-    def __init__(self):
-        self._envs = {
-            "aws_access_key_id": os.environ.get("AWS_ACCESS_KEY_ID"),
-            "aws_secret_access_key": os.environ.get("AWS_SECRET_ACCESS_KEY"),
-            "region_name": os.environ.get(
-                "AWS_REGION", "us-west-1"
-            ),  # Usando um valor padrão se a variável não estiver definida
-            "s3_bucket": os.environ.get("S3_BUCKET_NAME"),
-            "datalake": os.environ.get("DELTA_LAKE_S3_PATH"),
-        }
+def upload_to_aws(data):
+    # Converte os dados para DataFrame
+    df = pd.DataFrame(data)
+    print(df)
 
-        for var in self._envs:
-            if self._envs[var] is None:
-                print(f"A variável de ambiente {var} não está definida.")
-                sys.exit(1)
+    # Salvando como parquet
+    buffer = BytesIO()
+    df.to_parquet(buffer, index=False)
+    buffer.seek(0)
 
-        self.s3 = boto3.client(
-            "s3",
-            aws_access_key_id=self._envs["aws_access_key_id"],
-            aws_secret_access_key=self._envs["aws_secret_access_key"],
-            region_name=self._envs["region_name"],
+    # Criar cliente S3
+    s3_client = boto3.client(
+        "s3",
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    )
+
+    try:
+        # Fazendo o upload
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME, Key="csv/catalogo.parquet", Body=buffer
         )
-
-    def upload_file(self, data, s3_key):
-        try:
-            self.s3.put_object(
-                Body=data.getvalue(), Bucket=self._envs["s3_bucket"], Key=s3_key
-            )
-        except NoCredentialsError:
-            print(
-                "Credenciais não encontradas. Certifique-se de configurar suas credenciais AWS corretamente."
-            )
-
-    def download_file(self, s3_key):
-        try:
-            file = self.s3.get_object(Bucket=self._envs["s3_bucket"], Key=s3_key)
-            print(f"Download bem-sucedido para {s3_key}")
-            return file
-        except NoCredentialsError:
-            print(
-                "Credenciais não encontradas. Certifique-se de configurar suas credenciais AWS corretamente."
-            )
-        except FileNotFoundError:
-            print(
-                f"Arquivo {s3_key} não encontrado no bucket {self._envs['s3_bucket']}."
-            )
-        except Exception as e:
-            print(f"Ocorreu um erro durante o download: {e}")
-
-    def list_object(self, prefix):
-        return self.s3.list_objects(Bucket=self._envs["s3_bucket"], Prefix=prefix)[
-            "Contents"
-        ]
+        print("Upload concluído com sucesso!")
+    except Exception as e:
+        print(f"Erro ao fazer upload: {e}")
