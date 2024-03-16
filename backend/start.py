@@ -9,16 +9,12 @@ import schedule
 schema = CompraSchema
 aws = S3Client()
 
-
-def apiCollector(schema, aws, repeat):
-    reponse = APICollector(schema, aws).start(repeat)
-    print("Finalizado")
-    return
-
-
-def getPostgre(aws, dbId):
-    postgres = PostgresCollector(aws, dbId).start()
-
+minha_classe = APICollector(schema, aws).start(500)
+print(minha_classe)
+#def apiCollector(schema, aws, repeat):
+#    response = APICollector(schema, aws).start(repeat)
+#    print("Finalizado")
+#    return
 
 # schedule.every(1).minutes.do(apiCollector,schema, aws, 50)
 
@@ -27,5 +23,8 @@ def getPostgre(aws, dbId):
 #     schedule.run_pending()
 #     time.sleep(1)
 
-getPostgre(aws, dbId=1)
-getPostgre(aws, dbId=2)
+#def getPostgre(aws, dbId):
+#    postgres = PostgresCollector(aws, dbId).start()
+
+#getPostgre(aws, dbId=1)
+#getPostgre(aws, dbId=2)
