@@ -1,8 +1,8 @@
 INSTALL httpfs;
 LOAD httpfs;
-SET s3_region='us-east-1';
-SET s3_access_key_id='AKIA5NHIIBLVN5SM3HNI';
-SET s3_secret_access_key='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';
+SET s3_region='s3_region';
+SET s3_access_key_id='s3_access_key_id';
+SET s3_secret_access_key='s3_secret_access_key';
 CREATE OR REPLACE TABLE sales AS SELECT * FROM read_parquet('s3://wkshop-salesrecords/api/api-response-compra2024-03-15T21:21:33.parquet');
 CREATE OR REPLACE TABLE store AS SELECT * FROM read_parquet('s3://wkshop-salesrecords/csv/catalogo.parquet');
 CREATE OR REPLACE TABLE sales_all AS SELECT * FROM read_parquet('s3://wkshop-salesrecords/api/*.parquet');
