@@ -32,10 +32,10 @@ class APICollector:
             response = None
             if param > 1:
                 response = requests.get(
-                    f"https://8000-guimarczews-lowcostdata-tglj9m4hd9x.ws-us108.gitpod.io/gerar_compra/{param}"
+                    f"https://8000-guimarczews-lowcostdata-tglj9m4hd9x.ws-us110.gitpod.io/gerar_compra/{param}"
                 ).json()
             else:
-                response = requests.get("https://8000-guimarczews-lowcostdata-tglj9m4hd9x.ws-us108.gitpod.io/gerar_compra").json()
+                response = requests.get("https://8000-guimarczews-lowcostdata-tglj9m4hd9x.ws-us110.gitpod.io/gerar_compra").json()
             return response
         
         def extractData(self, response):
